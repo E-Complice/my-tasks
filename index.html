@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en-NG">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0f766e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>My Tasks</title>
+<style>:root{
+  --bg:#f5f3ee;--card:#ffffff;--ink:#1c2321;--muted:#68726e;--line:#e6e2d9;
+  --accent:#0f766e;--accent-ink:#ffffff;--accent-soft:#d9efeb;
+  --warn:#b45309;--warn-soft:#fdf0d8;--bad:#b42318;--bad-soft:#fde4e1;--ok:#15803d;
+  --block:#eceae3;--shadow:0 1px 2px rgba(20,30,25,.06),0 6px 20px rgba(20,30,25,.06);
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#0e1311;--card:#171e1b;--ink:#eef2ef;--muted:#93a09a;--line:#27312d;
+    --accent:#2dd4bf;--accent-ink:#04201c;--accent-soft:#12302b;
+    --warn:#fbbf24;--warn-soft:#33270b;--bad:#f87171;--bad-soft:#3a1714;--ok:#4ade80;
+    --block:#1b2420;--shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.3);}
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:15px;line-height:1.4}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+#app{max-width:560px;margin:0 auto;padding:18px 16px 190px}
+h1,h2,h3,p{margin:0}
+.top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+.hello{font-size:13px;color:var(--muted);font-weight:500}
+.date{font-size:24px;font-weight:800;letter-spacing:-.02em}
+.iconbtn{width:40px;height:40px;border-radius:12px;background:var(--card);box-shadow:var(--shadow);display:grid;place-items:center}
+.iconbtn svg{width:20px;height:20px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.stat{background:var(--card);border-radius:16px;padding:12px;box-shadow:var(--shadow)}
+.stat b{display:block;font-size:22px;font-weight:800;letter-spacing:-.02em}
+.stat span{font-size:12px;color:var(--muted)}
+.stat.bad b{color:var(--bad)}
+.banner{border-radius:16px;padding:12px 14px;margin-bottom:10px;font-size:14px}
+.banner.warn{background:var(--warn-soft);color:var(--ink)}
+.banner.bad{background:var(--bad-soft)}
+.banner .row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.btn{border-radius:12px;padding:9px 14px;font-weight:700;font-size:14px;background:var(--card);box-shadow:inset 0 0 0 1px var(--line)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);box-shadow:none}
+.btn.danger{color:var(--bad)}
+.btn.small{padding:6px 10px;font-size:13px;border-radius:10px}
+.tabs{display:flex;background:var(--block);border-radius:14px;padding:4px;margin:6px 0 12px}
+.tabs button{flex:1;padding:8px 0;border-radius:11px;font-weight:700;color:var(--muted);font-size:14px}
+.tabs button[aria-selected=true]{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
+.free{font-size:13px;color:var(--muted);margin:0 2px 10px}
+.day-h{display:flex;justify-content:space-between;align-items:baseline;margin:16px 2px 8px}
+.day-h h3{font-size:15px;font-weight:800}
+.day-h span{font-size:12px;color:var(--muted)}
+.item{display:flex;gap:12px;align-items:flex-start;background:var(--card);border-radius:16px;padding:12px;margin-bottom:8px;box-shadow:var(--shadow);width:100%;text-align:left}
+.item.done{opacity:.55}
+.item.done .t{text-decoration:line-through}
+.item.late{box-shadow:inset 0 0 0 1.5px var(--bad),var(--shadow)}
+.chk{flex:none;width:26px;height:26px;border-radius:9px;box-shadow:inset 0 0 0 2px var(--line);display:grid;place-items:center;margin-top:1px}
+.chk svg{width:16px;height:16px;opacity:0}
+.item.done .chk{background:var(--ok);box-shadow:none;color:#fff}
+.item.done .chk svg{opacity:1}
+.body{flex:1;min-width:0}
+.t{font-weight:700;font-size:15px;overflow-wrap:anywhere}
+.m{font-size:12.5px;color:var(--muted);margin-top:2px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pill{display:inline-flex;gap:4px;align-items:center;border-radius:999px;padding:1px 8px;font-size:11.5px;font-weight:700;background:var(--block);color:var(--muted)}
+.pill.hi{background:var(--warn-soft);color:var(--warn)}
+.pill.late{background:var(--bad-soft);color:var(--bad)}
+.pill.sync{background:var(--accent-soft);color:var(--accent)}
+.fixed{display:flex;gap:10px;align-items:center;padding:6px 12px;margin-bottom:6px;color:var(--muted);font-size:13px;border-left:3px solid var(--line);margin-left:6px}
+.fixed b{font-weight:600}
+.nowline{display:flex;align-items:center;gap:8px;margin:6px 0;color:var(--accent);font-size:12px;font-weight:800}
+.nowline:after{content:"";flex:1;height:2px;background:var(--accent);border-radius:2px;opacity:.6}
+.empty{text-align:center;color:var(--muted);padding:34px 20px;background:var(--card);border-radius:18px;box-shadow:var(--shadow)}
+.empty b{display:block;color:var(--ink);font-size:16px;margin-bottom:6px}
+.dock{position:fixed;left:0;right:0;bottom:0;padding:10px 12px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--bg) 78%,transparent)}
+.dock-in{max-width:560px;margin:0 auto}
+.say{background:var(--card);border-radius:18px;padding:12px 14px;margin-bottom:10px;box-shadow:var(--shadow);font-size:14.5px}
+.say .you{font-size:12.5px;color:var(--muted);margin-bottom:4px}
+.say .bot{white-space:pre-wrap;overflow-wrap:anywhere}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.chip{border-radius:999px;padding:7px 13px;font-weight:700;font-size:13.5px;background:var(--accent-soft);color:var(--accent)}
+.bar{display:flex;gap:8px;align-items:center}
+.bar input{flex:1;min-width:0;height:50px;border-radius:25px;border:0;padding:0 18px;background:var(--card);box-shadow:var(--shadow),inset 0 0 0 1px var(--line);font-size:16px;outline:none}
+.bar input:focus{box-shadow:var(--shadow),inset 0 0 0 2px var(--accent)}
+.mic{flex:none;width:58px;height:58px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;box-shadow:0 6px 18px rgba(15,118,110,.35)}
+.mic svg{width:26px;height:26px}
+.mic.on{background:var(--bad);color:#fff;animation:pulse 1.2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(180,35,24,.5)}100%{box-shadow:0 0 0 18px rgba(180,35,24,0)}}
+.send{flex:none;width:44px;height:50px;color:var(--accent);display:grid;place-items:center}
+.send svg{width:24px;height:24px}
+.sheet-bg{position:fixed;inset:0;background:rgba(10,15,12,.5);display:flex;align-items:flex-end;justify-content:center;z-index:10}
+.sheet{width:100%;max-width:560px;max-height:88vh;overflow:auto;background:var(--bg);border-radius:24px 24px 0 0;padding:18px 16px calc(22px + env(safe-area-inset-bottom))}
+.sheet h2{font-size:19px;font-weight:800;margin-bottom:12px}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:12.5px;color:var(--muted);font-weight:700;margin-bottom:5px}
+.field input,.field select{width:100%;height:46px;border-radius:12px;border:0;padding:0 12px;background:var(--card);box-shadow:inset 0 0 0 1px var(--line);font-size:16px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.seg{display:flex;background:var(--block);border-radius:12px;padding:3px}
+.seg button{flex:1;padding:9px 0;border-radius:10px;font-weight:700;font-size:13.5px;color:var(--muted)}
+.seg button[aria-pressed=true]{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
+.rowbtn{display:flex;gap:8px;margin-top:14px}
+.rowbtn .btn{flex:1}
+.set{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--card);border-radius:14px;padding:12px 14px;margin-bottom:8px}
+.set small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.sw{flex:none;width:46px;height:28px;border-radius:14px;background:var(--line);position:relative;transition:.15s}
+.sw:after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.15s}
+.sw[aria-checked=true]{background:var(--accent)}
+.sw[aria-checked=true]:after{left:21px}
+.tip{font-size:13px;color:var(--muted);background:var(--card);border-radius:14px;padding:12px 14px;margin-bottom:8px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:var(--muted)}
+.dot.ok{background:var(--ok)}.dot.no{background:var(--bad)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.listen{display:flex;align-items:center;gap:12px;background:var(--bad-soft);color:var(--ink);border-radius:18px;padding:12px 14px;margin-bottom:10px;font-weight:700;font-size:14.5px}
+.listen[hidden]{display:none}
+.wave{display:flex;gap:3px;align-items:center;height:22px;flex:none}
+.wave i{display:block;width:4px;height:8px;border-radius:2px;background:var(--bad);animation:wv 0.9s ease-in-out infinite}
+.wave i:nth-child(2){animation-delay:.12s}.wave i:nth-child(3){animation-delay:.24s}.wave i:nth-child(4){animation-delay:.36s}.wave i:nth-child(5){animation-delay:.48s}
+@keyframes wv{0%,100%{height:6px}50%{height:22px}}
+@media (prefers-reduced-motion:reduce){.wave i,.mic.on{animation:none}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>window.__OFFLINE__=true;</script>
+<script>
+/*CORE_START*/
+const DAY = 1440, TZ_OFF = 60, MIN48 = 2880;
+const pad = n => String(n).padStart(2, '0');
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const DOWFULL = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+/* Time model: "L-minutes" = minutes since epoch, expressed in Lagos local time (UTC+1, no DST). */
+function nowL() { return Math.floor(Date.now() / 60000) + TZ_OFF; }
+function dayStart(t) { return Math.floor(t / DAY) * DAY; }
+function parts(t) {
+  const d = new Date(t * 60000);
+  return { y: d.getUTCFullYear(), mo: d.getUTCMonth() + 1, d: d.getUTCDate(), h: d.getUTCHours(), mi: d.getUTCMinutes(), dow: d.getUTCDay() };
+}
+function mk(y, mo, d, h, mi) { return Date.UTC(y, mo - 1, d, h || 0, mi || 0) / 60000; }
+function isoL(t) { const p = parts(t); return p.y + '-' + pad(p.mo) + '-' + pad(p.d) + 'T' + pad(p.h) + ':' + pad(p.mi) + ':00'; }
+function keyOf(t) { const p = parts(t); return p.y + '-' + pad(p.mo) + '-' + pad(p.d); }
+function fromKey(k) { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(k || ''); return m ? mk(+m[1], +m[2], +m[3]) : null; }
+function hhmm(t) { const p = parts(t); return pad(p.h) + ':' + pad(p.mi); }
+function fmtTime(t) { const p = parts(t); return (p.h % 12 || 12) + ':' + pad(p.mi) + (p.h < 12 ? ' AM' : ' PM'); }
+function fmtDay(t) { const p = parts(t); return DOW[p.dow] + ' ' + p.d + ' ' + MON[p.mo - 1]; }
+function fmtDayLong(t) { const p = parts(t); return DOWFULL[p.dow] + ', ' + p.d + ' ' + MON[p.mo - 1]; }
+function fmtDur(m) {
+  if (m < 60) return m + ' min';
+  const h = Math.floor(m / 60), r = m % 60;
+  return r ? h + 'h ' + r + 'm' : h + (h === 1 ? ' hour' : ' hours');
+}
+function relDay(t, now) {
+  const d = (dayStart(t) - dayStart(now)) / DAY;
+  if (d === 0) return 'today'; if (d === 1) return 'tomorrow'; if (d === -1) return 'yesterday';
+  return fmtDay(t);
+}
+
+/* Your fixed routine (Nigerian time). D = start of a day. */
+function fixedBlocks(D) {
+  const w = parts(D).dow, B = [];
+  const add = (h1, m1, h2, m2, kind, label) => B.push({ s: D + h1 * 60 + m1, e: D + h2 * 60 + m2, kind, label, fixed: true });
+  add(0, 30, 6, 30, 'sleep', 'Sleep');
+  add(12, 0, 13, 0, 'lunch', 'Lunch');
+  if (w >= 1 && w <= 5) add(15, 0, 23, 30, 'work', 'Work');
+  if (w >= 2 && w <= 6) add(9, 0, 11, 0, 'fatima', "Ms. Fatima's work");
+  if (w === 0) add(8, 0, 14, 0, 'church', 'Church');
+  return B;
+}
+
+const WIN = { morning: [8, 12], afternoon: [12, 17], evening: [17, 22], night: [19, 22] };
+function rangesFor(type, win) {
+  if (win && WIN[win]) return [WIN[win]];
+  return type === 'out' ? [[8, 18]] : [[8, 18], [18, 22]]; /* day fills first, evening after */
+}
+
+function busyFor(D, tasks, ext, excludeId) {
+  const lo = D, hi = D + DAY, out = fixedBlocks(D);
+  for (const t of tasks) {
+    if (t.done || t.id === excludeId) continue;
+    if (t.start < hi && t.start + t.dur > lo) out.push({ s: t.start, e: t.start + t.dur, kind: 'task', label: t.title, id: t.id });
+  }
+  for (const x of ext || []) if (x.s < hi && x.e > lo) out.push({ s: x.s, e: x.e, kind: 'ext', label: x.label || 'Calendar event' });
+  return out;
+}
+function isFree(s, e, busy, type) {
+  for (const b of busy) {
+    const p = b.kind === 'work' ? (type === 'out' ? 30 : 0) : b.kind === 'church' ? 30 : (b.fixed ? 0 : 10);
+    if (s < b.e + p && e > b.s - p) return false;
+  }
+  return true;
+}
+function slotOnDay(D, dur, type, win, tasks, ext, now, excludeId) {
+  const busy = busyFor(D, tasks, ext, excludeId);
+  const earliest = D === dayStart(now) ? now + 15 : D;
+  for (const [a, b] of rangesFor(type, win)) {
+    let s = Math.ceil(Math.max(D + a * 60, earliest) / 15) * 15;
+    for (; s + dur <= D + b * 60; s += 15) if (isFree(s, s + dur, busy, type)) return s;
+  }
+  return null;
+}
+function freeMinutes(D, tasks, ext, now) {
+  const busy = busyFor(D, tasks, ext, null);
+  const from = Math.max(D + 8 * 60, D === dayStart(now) ? Math.ceil(now / 15) * 15 : D);
+  let n = 0;
+  for (let s = from; s < D + 22 * 60; s += 15) if (isFree(s, s + 15, busy, 'desk')) n += 15;
+  return n;
+}
+
+/* Make room: move a less important, auto-placed task that is at least 48h away. */
+function makeRoom(task, D, tasks, ext, now) {
+  const cands = tasks.filter(c => c.auto && !c.done && c.id !== task.id && dayStart(c.start) === D && c.start - now >= MIN48 && c.imp < task.imp)
+    .sort((a, b) => a.imp - b.imp || b.start - a.start);
+  for (const c of cands) {
+    const rest = tasks.filter(x => x.id !== c.id);
+    const s = slotOnDay(D, task.dur, task.type, task.win, rest, ext, now, null);
+    if (s === null) continue;
+    const withNew = rest.concat([Object.assign({}, task, { start: s })]);
+    for (let k = 0; k < 30; k++) {
+      const s2 = slotOnDay(D + k * DAY, c.dur, c.type, c.win, withNew, ext, now, null);
+      if (s2 !== null) return { start: s, moved: { task: c, newStart: s2 } };
+    }
+  }
+  return null;
+}
+
+/* Pick a time automatically. Dreq = a specific day (start of day) or null for "earliest". */
+function scheduleAuto(task, Dreq, tasks, ext, now) {
+  const today = dayStart(now);
+  if (Dreq !== null) {
+    if (Dreq < today) Dreq = today;
+    const s = slotOnDay(Dreq, task.dur, task.type, task.win, tasks, ext, now, task.id);
+    if (s !== null) return { start: s };
+    const r = makeRoom(task, Dreq, tasks, ext, now);
+    if (r) return r;
+    for (let k = 1; k <= 30; k++) {
+      const s2 = slotOnDay(Dreq + k * DAY, task.dur, task.type, task.win, tasks, ext, now, task.id);
+      if (s2 !== null) return { start: s2, spilled: true, wanted: Dreq };
+    }
+    return null;
+  }
+  for (let k = 0; k < 60; k++) {
+    const s = slotOnDay(today + k * DAY, task.dur, task.type, task.win, tasks, ext, now, task.id);
+    if (s !== null) return { start: s };
+  }
+  return null;
+}
+
+function conflictsFor(s, e, tasks, ext, excludeId) {
+  const out = [], seen = {};
+  for (let D = dayStart(s); D <= dayStart(e - 1); D += DAY) {
+    for (const b of busyFor(D, tasks, ext, excludeId)) {
+      if (s < b.e && e > b.s) { const k = b.kind + b.label; if (!seen[k]) { seen[k] = 1; out.push({ kind: b.kind, label: b.label, s: b.s, e: b.e }); } }
+    }
+  }
+  return out;
+}
+
+/* Closest free time to the one asked for (same day first, then later days at the same hour). */
+function nearestFree(req, dur, type, tasks, ext, now, excludeId) {
+  for (let k = 0; k <= 30; k++) {
+    const D = dayStart(req) + k * DAY, target = req + k * DAY, busy = busyFor(D, tasks, ext, excludeId);
+    let best = null, bd = 1e9;
+    for (let s = D + 7 * 60; s + dur <= D + 22 * 60; s += 15) {
+      if (s < now + 10) continue;
+      if (!isFree(s, s + dur, busy, type)) continue;
+      const d = Math.abs(s - target);
+      if (d < bd) { bd = d; best = s; }
+    }
+    if (best !== null) return best;
+  }
+  return null;
+}
+
+/* ---------- Understanding what you type or say (offline fallback; Claude does the main parsing) ---------- */
+const NUMW = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8 };
+const WDI = { sunday: 0, sun: 0, monday: 1, mon: 1, tuesday: 2, tues: 2, tue: 2, wednesday: 3, wed: 3, thursday: 4, thurs: 4, thur: 4, thu: 4, friday: 5, fri: 5, saturday: 6, sat: 6 };
+const MONI = { jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12 };
+function cut(s, re) { const m = s.match(re); return m ? [s.replace(m[0], ' '), m] : [s, null]; }
+
+function parseWhen(text, now) {
+  let s = ' ' + String(text || '') + ' ', m;
+  const r = { date: null, time: null, endTime: null, dur: null, win: null, any: false };
+  const today = dayStart(now), tp = parts(today);
+  [s, m] = cut(s, /\b(any ?time|you (?:can )?(?:choose|pick|decide|fix)|whenever|no specific time|your choice|doesn'?t matter|not important|no time|anywhere)\b/i); if (m) r.any = true;
+  [s, m] = cut(s, /\b(?:for\s+|about\s+|around\s+)?(\d+(?:\.\d+)?|one|two|three|four|five|six|seven|eight)\s*(?:hours?|hrs?|hr)\b/i);
+  if (m) { const n = NUMW[m[1].toLowerCase()] || parseFloat(m[1]); r.dur = Math.round(n * 60); }
+  else {
+    [s, m] = cut(s, /\b(?:for\s+|about\s+)?(\d+)\s*(?:minutes?|mins?)\b/i);
+    if (m) r.dur = +m[1];
+    else { [s, m] = cut(s, /\b(?:half an hour|half hour)\b/i); if (m) r.dur = 30; else { [s, m] = cut(s, /\ban hour\b/i); if (m) r.dur = 60; } }
+  }
+  /* dates */
+  [s, m] = cut(s, /\b(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?\b/);
+  if (m) { let y = tp.y; if (m[3]) { y = +m[3]; if (y < 100) y += 2000; } r.date = mk(y, +m[2], +m[1]); if (!m[3] && r.date < today) r.date = mk(y + 1, +m[2], +m[1]); }
+  if (r.date === null) {
+    let mm; [s, mm] = cut(s, /\b(\d{1,2})(?:st|nd|rd|th)?\s*(?:of\s+)?(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\b/i);
+    if (mm) { r.date = mk(tp.y, MONI[mm[2].toLowerCase()], +mm[1]); if (r.date < today) r.date = mk(tp.y + 1, MONI[mm[2].toLowerCase()], +mm[1]); }
+    else {
+      [s, mm] = cut(s, /\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+(\d{1,2})(?:st|nd|rd|th)?\b/i);
+      if (mm) { r.date = mk(tp.y, MONI[mm[1].toLowerCase()], +mm[2]); if (r.date < today) r.date = mk(tp.y + 1, MONI[mm[1].toLowerCase()], +mm[2]); }
+    }
+  }
+  if (r.date === null) {
+    [s, m] = cut(s, /\bday after tomorrow\b/i); if (m) r.date = today + 2 * DAY;
+  }
+  if (r.date === null) { [s, m] = cut(s, /\b(tomorrow|tmrw|tomoro|2moro)\b/i); if (m) r.date = today + DAY; }
+  if (r.date === null) { [s, m] = cut(s, /\bin\s+(\d+|one|two|three|four|five)\s+(days?|weeks?)\b/i); if (m) { const n = NUMW[m[1].toLowerCase()] || +m[1]; r.date = today + n * (/week/i.test(m[2]) ? 7 : 1) * DAY; } }
+  if (r.date === null) { [s, m] = cut(s, /\bnext week\b/i); if (m) { const dw = tp.dow; r.date = today + (((8 - dw) % 7) || 7) * DAY; } }
+  if (r.date === null) { [s, m] = cut(s, /\bthis weekend\b/i); if (m) r.date = today + (((6 - tp.dow) + 7) % 7) * DAY; }
+  if (r.date === null) {
+    [s, m] = cut(s, /\b(?:(next|this|on)\s+)?(sunday|monday|tuesday|wednesday|thursday|friday|saturday|sun|mon|tues|tue|wed|thurs|thur|thu|fri|sat)\b/i);
+    if (m) { const tw = WDI[m[2].toLowerCase()]; let d = (tw - tp.dow + 7) % 7; if (d === 0 && m[1] && /next/i.test(m[1])) d = 7; r.date = today + d * DAY; }
+  }
+  if (r.date === null) { [s, m] = cut(s, /\btoday\b/i); if (m) r.date = today; }
+  /* periods */
+  [s, m] = cut(s, /\b(tonight)\b/i); if (m) { r.win = 'night'; if (r.date === null) r.date = today; }
+  if (!r.win) { [s, m] = cut(s, /\b(morning|afternoon|evening|night)\b/i); if (m) r.win = m[1].toLowerCase(); }
+  /* clock times */
+  const tre = /\b(\d{1,2})(?:[:.](\d{2}))?\s*(am|pm|a\.m\.?|p\.m\.?)|\b(\d{1,2}):(\d{2})\b|\b(noon|midday)\b/ig;
+  const found = []; let t;
+  while ((t = tre.exec(s)) !== null) {
+    let h, mi = 0;
+    if (t[6]) h = 12;
+    else if (t[3]) { h = +t[1]; mi = +(t[2] || 0); const pm = /^p/i.test(t[3]); if (pm && h < 12) h += 12; if (!pm && h === 12) h = 0; }
+    else { h = +t[4]; mi = +t[5]; }
+    if (h < 24 && mi < 60) found.push({ h, mi, idx: t.index, len: t[0].length });
+  }
+  if (found.length) {
+    r.time = found[0].h * 60 + found[0].mi;
+    if (found.length > 1 && /\b(to|till|until|-|–)\b/i.test(s.slice(found[0].idx + found[0].len, found[1].idx))) {
+      r.endTime = found[1].h * 60 + found[1].mi;
+      if (r.endTime > r.time && r.dur === null) r.dur = r.endTime - r.time;
+    }
+    for (let i = found.length - 1; i >= 0; i--) s = s.slice(0, found[i].idx) + ' ' + s.slice(found[i].idx + found[i].len);
+  }
+  r.rest = s;
+  return r;
+}
+
+const OUT_RE = /\b(go|visit|buy|shop|shopping|market|bank|church|meet|meeting|pick ?up|collect|drop|errand|clinic|hospital|doctor|pharmacy|barber|salon|travel|trip|airport|office|interview|deliver|post office|fuel|mechanic|park|gym|wedding|burial|funeral|school|lecture|class|see)\b/i;
+const HIGH_RE = /\b(urgent|important|asap|deadline|must|exam|interview|rent|bill|pay|submit|doctor|hospital|flight|appointment)\b/i;
+const LOW_RE = /\b(maybe|if i can|small|minor|later|optional|sometime|whenever)\b/i;
+function inferType(t) { return OUT_RE.test(t) ? 'out' : 'desk'; }
+function inferImp(t) { return HIGH_RE.test(t) ? 3 : LOW_RE.test(t) ? 1 : 2; }
+
+function cleanTitle(s) {
+  s = ' ' + s.replace(/[,.;]+/g, ' ') + ' ';
+  s = s.replace(/\b(please|abeg|hey|hi|okay|ok|remind me to|remind me|make you add|add a task|add task|add|set a task|set|schedule|put|i (?:have|need|want|wan|go) to|i have|to my (?:list|calendar|to-?do(?: list)?)|my to-?do(?: list)?|that can be|can be|should be|will be|and then)\b/gi, ' ');
+  s = s.replace(/\s+/g, ' ').trim();
+  for (let i = 0; i < 3; i++) s = s.replace(/^(?:to|that|the|on|at|by|for|from|in|and|of|a)\s+/i, '').replace(/\s+(?:to|that|on|at|by|for|from|in|and|of|a|the)$/i, '');
+  s = s.trim();
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
+}
+
+function parseLocal(text, now) {
+  const raw = String(text || '').trim();
+  if (/\b(delete|remove|cancel|forget)\b/i.test(raw)) return { intent: 'delete', target: cleanTitle(raw.replace(/\b(delete|remove|cancel|forget|task|the)\b/ig, ' ')) };
+  if (/\b(done|finished|completed|finish|complete|don finish)\b/i.test(raw) && !/\b(to finish|will finish)\b/i.test(raw)) return { intent: 'done', target: cleanTitle(raw.replace(/\b(done|finished|completed|finish|complete|don|i|have|has|with|the|task|mark|as)\b/ig, ' ')) };
+  if (/\b(what(?:'s| is| are)?|which|how many|show me|tell me|read (?:out )?my)\b.*\b(today|tomorrow|plan|schedule|tasks?|day|list|agenda|next)\b/i.test(raw)) return { intent: 'query', target: /tomorrow/i.test(raw) ? 'tomorrow' : 'today' };
+  const segs = raw.split(/\s*(?:;|\bthen\b|\balso\b|\bplus\b)\s*/i).filter(x => x.trim());
+  const tasks = segs.map(seg => {
+    const w = parseWhen(seg, now), title = cleanTitle(w.rest) || 'Task';
+    return { title, date: w.date, time: w.time, dur: w.dur, win: w.win, any: w.any, type: inferType(seg), imp: inferImp(seg) };
+  });
+  return { intent: 'add', tasks };
+}
+
+function fuzzyFind(tasks, target) {
+  const tok = String(target || '').toLowerCase().split(/\W+/).filter(w => w.length > 2);
+  let best = null, bs = 0;
+  for (const t of tasks) {
+    const tt = t.title.toLowerCase(); let sc = 0;
+    for (const w of tok) if (tt.includes(w)) sc++;
+    if (sc > bs) { bs = sc; best = t; }
+  }
+  return best;
+}
+
+(function () {
+'use strict';
+const TZ = 'Africa/Lagos';
+const OFFLINE = !!window.__OFFLINE__;
+const ROUTINE_NAMES = ['Work (shift)', "Ms. Fatima's work", 'Sleep (protected)', 'Lunch', 'Church'];
+const SVG = {
+  mic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
+  send: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.4 20.4 21 12 3.4 3.6l-.1 6.5L15 12 3.3 13.9z"/></svg>',
+  gear: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
+  stop: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="3"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>'
+};
+const caps = { db: null, user: null, dict: null, tts: null, sample: null, mcp: null };
+const state = {
+  tasks: [], ext: [], tab: 'today', ready: false, say: null, pending: null, busy: false, listening: false,
+  convo: false, cal: { status: 'idle', msg: '' }, settings: { speak: true, email: true, calendar: true }, aiNote: '', undo: null
+};
+let uidStr = null, col = null, appDoc = null, voiceBuf = '', voices = [];
+
+/* ---------- tiny DOM helper (all text goes through textContent) ---------- */
+function h(tag, props) {
+  const el = document.createElement(tag);
+  if (props) for (const k in props) {
+    const v = props[k];
+    if (v == null || v === false) continue;
+    if (k === 'class') el.className = v;
+    else if (k === 'html') el.innerHTML = v;
+    else if (k.slice(0, 2) === 'on') el.addEventListener(k.slice(2), v);
+    else el.setAttribute(k, v === true ? '' : v);
+  }
+  for (let i = 2; i < arguments.length; i++) {
+    const c = arguments[i];
+    if (c == null || c === false) continue;
+    el.append(c.nodeType ? c : document.createTextNode(String(c)));
+  }
+  return el;
+}
+const $ = s => document.querySelector(s);
+const newId = () => 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const wait = ms => new Promise(r => setTimeout(r, ms));
+
+/* ---------- capabilities ---------- */
+function makeLocalDictation() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition; if (!SR) return null;
+  let rec = null; const cb = { p() {}, f() {}, s() {}, e() {} };
+  return {
+    onPartial(f) { cb.p = f; }, onFinal(f) { cb.f = f; }, onState(f) { cb.s = f; }, onError(f) { cb.e = f; },
+    start() {
+      return new Promise((res, rej) => {
+        rec = new SR(); rec.lang = 'en-NG'; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 1;
+        rec.onstart = () => { cb.s({ state: 'listening' }); res(); };
+        rec.onresult = ev => { let interim = ''; for (let i = ev.resultIndex; i < ev.results.length; i++) { const r = ev.results[i]; if (r.isFinal) cb.f({ text: r[0].transcript.trim() }); else interim += r[0].transcript; } if (interim) cb.p({ text: interim.trim() }); };
+        rec.onerror = ev => { if (ev.error === 'not-allowed' || ev.error === 'service-not-allowed') rej({ code: 'not_granted' }); else if (ev.error === 'network') cb.e({ code: 'network' }); };
+        rec.onend = () => cb.s({ state: 'idle', reason: 'ended' });
+        try { rec.start(); } catch (e) { rej({ code: 'dismissed' }); }
+      });
+    },
+    async stop() { try { rec && rec.stop(); } catch (e) {} }
+  };
+}
+async function use(name) {
+  if (OFFLINE) return name === 'dictation' ? makeLocalDictation() : null;
+  try {
+    if (!window.claude || !window.claude.use) return null;
+    return await Promise.race([window.claude.use(name), wait(10000).then(() => null)]);
+  } catch (e) { return null; }
+}
+
+/* ---------- storage ---------- */
+function lsGet(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+let writeQ = Promise.resolve();
+function saveTask(t) {
+  const i = state.tasks.findIndex(x => x.id === t.id);
+  if (i >= 0) state.tasks[i] = t; else state.tasks.push(t);
+  lsSet('tt_tasks', state.tasks);
+  if (col) writeQ = writeQ.then(() => col.doc(t.id).set(JSON.parse(JSON.stringify(t)))).catch(() => {});
+}
+function removeTask(t) {
+  state.tasks = state.tasks.filter(x => x.id !== t.id);
+  lsSet('tt_tasks', state.tasks);
+  if (col) writeQ = writeQ.then(() => col.doc(t.id).delete()).catch(() => {});
+}
+function saveSettings() {
+  lsSet('tt_settings', state.settings);
+  if (appDoc) writeQ = writeQ.then(() => appDoc.set({ settings: state.settings })).catch(() => {});
+}
+async function initStore() {
+  const s = lsGet('tt_settings'); if (s) Object.assign(state.settings, s);
+  if (OFFLINE) state.settings.calendar = false;
+  const local = lsGet('tt_tasks') || [];
+  caps.db = await use('db'); caps.user = await use('user');
+  try { uidStr = caps.user ? await caps.user.id() : null; } catch (e) {}
+  if (caps.db && uidStr) {
+    appDoc = caps.db.doc('data/users/' + uidStr + '/app');
+    col = appDoc.collection('tasks');
+    try { const d = await appDoc.get(); if (d.exists && d.data().settings) Object.assign(state.settings, d.data().settings); } catch (e) {}
+    let first = true;
+    const timer = setTimeout(() => { if (!state.ready) { state.tasks = local; state.ready = true; render(); } }, 10000);
+    col.onSnapshot(snap => {
+      clearTimeout(timer);
+      const list = snap.docs.map(d => d.data());
+      if (first && !list.length && local.length) { first = false; local.forEach(t => saveTask(t)); state.tasks = local; }
+      else { first = false; state.tasks = list; lsSet('tt_tasks', list); }
+      state.ready = true; render();
+    }, () => { state.tasks = local; state.ready = true; col = null; render(); });
+  } else { state.tasks = local; state.ready = true; }
+}
+
+/* ---------- voice out: Nigerian English first ---------- */
+function loadVoices() { try { voices = window.speechSynthesis ? speechSynthesis.getVoices() : []; } catch (e) { voices = []; } }
+function ngVoice() { return voices.find(v => /en[-_]NG/i.test(v.lang)) || voices.find(v => /nigeria/i.test(v.name)) || null; }
+let speakSeq = 0, ttsBusy = false;
+function isSpeaking() { try { return ttsBusy || !!(window.speechSynthesis && speechSynthesis.speaking); } catch (e) { return ttsBusy; } }
+function speak(text) {
+  const id = ++speakSeq;
+  const done = new Promise(resolve => {
+    if (!state.settings.speak || !text) { resolve(); return; }
+    try { if (window.speechSynthesis) speechSynthesis.cancel(); if (caps.tts) caps.tts.stop(); } catch (e) {}
+    const clean = text.replace(/[“”"]/g, '').replace(/\s+/g, ' ');
+    const t0 = Date.now(), minMs = Math.min(30000, clean.length * 45);
+    const guard = setTimeout(resolve, 45000);
+    /* never report "finished" sooner than the words could really take to say */
+    const fin = () => { clearTimeout(guard); setTimeout(resolve, Math.max(0, minMs - (Date.now() - t0))); };
+    try {
+      const v = ngVoice();
+      if (v && window.speechSynthesis) { const u = new SpeechSynthesisUtterance(clean); u.voice = v; u.lang = v.lang; u.rate = 0.95; u.onend = fin; u.onerror = fin; speechSynthesis.speak(u); return; }
+      if (caps.tts) { caps.tts.speak(clean, { voice: 'buttery', rate: 0.95, language: 'en' }).then(fin, fin); return; }
+      if (window.speechSynthesis) { const u = new SpeechSynthesisUtterance(clean); u.lang = 'en-NG'; u.rate = 0.95; u.onend = fin; u.onerror = fin; speechSynthesis.speak(u); return; }
+    } catch (e) {}
+    fin();
+  });
+  return done.then(() => id === speakSeq);
+}
+
+/* ---------- Google Calendar ---------- */
+async function calCall(tool, input) {
+  const r = await caps.mcp.callTool('Google Calendar', tool, input);
+  let p = r && r.payload;
+  if (typeof p === 'string') { try { p = JSON.parse(p); } catch (e) {} }
+  return p;
+}
+function calErr(e) {
+  const c = (e && e.code) || 'unknown';
+  state.cal.status = c;
+  state.cal.msg = (e && e.message) || '';
+}
+function remindersFor(t) {
+  const r = [];
+  if (state.settings.email) { if (t.imp >= 3) r.push({ method: 'email', minutes: 1440 }); r.push({ method: 'email', minutes: t.imp >= 2 ? 120 : 30 }); }
+  r.push({ method: 'popup', minutes: t.imp >= 3 ? 60 : 30 });
+  if (t.imp >= 3) r.push({ method: 'popup', minutes: 10 });
+  return r;
+}
+const evTitle = t => (t.done ? '✓ ' : '') + t.title;
+async function syncTask(t) {
+  if (!state.settings.calendar || !caps.mcp) return false;
+  try {
+    if (t.eventId) {
+      await calCall('update_event', { eventId: t.eventId, summary: evTitle(t), startTime: isoL(t.start), endTime: isoL(t.start + t.dur), timeZone: TZ, overrideReminders: remindersFor(t), notificationLevel: 'NONE' });
+    } else {
+      const p = await calCall('create_event', {
+        summary: evTitle(t), startTime: isoL(t.start), endTime: isoL(t.start + t.dur), timeZone: TZ,
+        description: 'From your To-Do Tracker. Priority: ' + ['', 'low', 'normal', 'high'][t.imp] + '. ' + (t.type === 'out' ? 'Needs you to go somewhere.' : 'Can be done anywhere.'),
+        overrideReminders: remindersFor(t), notificationLevel: 'NONE'
+      });
+      if (!p || !p.id) throw { code: 'upstream_error', message: 'Calendar did not return an event id' };
+      t.eventId = p.id;
+    }
+    t.synced = true; state.cal.status = 'ok'; lsSet('tt_calok', 1); saveTask(t); return true;
+  } catch (e) { calErr(e); t.synced = false; saveTask(t); return false; }
+}
+async function unsyncTask(t) {
+  if (!t.eventId || !caps.mcp) return;
+  try { await calCall('delete_event', { eventId: t.eventId, notificationLevel: 'NONE' }); } catch (e) {}
+}
+async function loadExt() {
+  if (!caps.mcp || !state.settings.calendar) return;
+  const now = nowL(), D = dayStart(now);
+  const p = await calCall('list_events', { startTime: isoL(D), endTime: isoL(D + 21 * 1440), orderBy: 'startTime', pageSize: 250 });
+  const items = Array.isArray(p) ? p : (p && (p.items || p.events)) || [];
+  const own = new Set(state.tasks.map(t => t.eventId).filter(Boolean));
+  state.ext = items.filter(x => x && x.start && x.start.dateTime && x.end && x.end.dateTime && !own.has(x.id) && ROUTINE_NAMES.indexOf(x.summary) < 0)
+    .map(x => ({ s: Math.floor(Date.parse(x.start.dateTime) / 60000) + 60, e: Math.floor(Date.parse(x.end.dateTime) / 60000) + 60, label: x.summary || 'Calendar event', id: x.id }));
+  state.cal.status = 'ok'; lsSet('tt_calok', 1);
+}
+async function connectCalendar() {
+  try { await loadExt(); } catch (e) { calErr(e); }
+  if (state.cal.status === 'ok') await syncAll();
+  render();
+}
+async function syncAll() {
+  for (const t of state.tasks.filter(x => !x.synced && !x.done)) { await syncTask(t); if (state.cal.status !== 'ok') break; }
+}
+
+/* ---------- calendar export (offline build) ---------- */
+function utcStamp(t) { const p = parts(t - 60); return p.y + pad(p.mo) + pad(p.d) + 'T' + pad(p.h) + pad(p.mi) + '00Z'; }
+function gcalLink(t) {
+  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(t.title) + '&dates=' + utcStamp(t.start) + '/' + utcStamp(t.start + t.dur) + '&ctz=Africa%2FLagos&details=' + encodeURIComponent('From your To-Do Tracker');
+}
+function icsText(list) {
+  const esc = x => String(x).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
+  const L = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//My Tasks//EN', 'CALSCALE:GREGORIAN'], stamp = utcStamp(nowL());
+  list.forEach(t => {
+    L.push('BEGIN:VEVENT', 'UID:' + t.id + '@mytasks', 'DTSTAMP:' + stamp, 'DTSTART:' + utcStamp(t.start), 'DTEND:' + utcStamp(t.start + t.dur), 'SUMMARY:' + esc(t.title), 'DESCRIPTION:' + esc('From your To-Do Tracker'));
+    const alarms = t.imp >= 3 ? [1440, 60, 10] : t.imp === 2 ? [120, 30] : [30];
+    alarms.forEach(m => L.push('BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:' + esc(t.title), 'TRIGGER:-PT' + m + 'M', 'END:VALARM'));
+    L.push('END:VEVENT');
+  });
+  L.push('END:VCALENDAR'); return L.join('\r\n');
+}
+function exportIcs() {
+  const now = nowL(), list = state.tasks.filter(t => !t.done && t.start + t.dur > now);
+  if (!list.length) { say('There are no upcoming tasks to export.'); return; }
+  const a = h('a', { href: URL.createObjectURL(new Blob([icsText(list)], { type: 'text/calendar' })), download: 'my-tasks.ics' });
+  document.body.append(a); a.click(); a.remove();
+  say('I made a calendar file with ' + list.length + (list.length === 1 ? ' task' : ' tasks') + '. Open it and choose Google Calendar to add them with reminders.');
+}
+
+/* ---------- understanding what you say ---------- */
+function normalize(o) {
+  if (!o || typeof o !== 'object') return null;
+  const intent = ['add', 'done', 'delete', 'query', 'other'].indexOf(o.intent) >= 0 ? o.intent : null;
+  if (!intent) return null;
+  const out = { intent, target: o.target || null, reply: o.reply || null, tasks: [] };
+  if (intent === 'add') {
+    for (const t of o.tasks || []) {
+      if (!t || !t.title) continue;
+      let time = null; const m = /^(\d{1,2}):(\d{2})$/.exec(t.time || ''); if (m) time = +m[1] * 60 + +m[2];
+      out.tasks.push({
+        title: String(t.title).slice(0, 120), date: fromKey(t.date), time, dur: t.durationMin > 0 ? Math.min(Math.round(t.durationMin), 720) : null,
+        win: ['morning', 'afternoon', 'evening', 'night'].indexOf(t.window) >= 0 ? t.window : null, any: !!t.anyTime,
+        type: t.type === 'out' ? 'out' : 'desk', imp: [1, 2, 3].indexOf(t.importance) >= 0 ? t.importance : 2
+      });
+    }
+    if (!out.tasks.length) return null;
+  }
+  return out;
+}
+async function understand(text, now) {
+  if (caps.sample) {
+    try {
+      const open = state.tasks.filter(t => !t.done).slice(0, 30).map(t => t.title).join(' | ') || '(none)';
+      const prompt = 'You turn a person\'s typed or spoken message into to-do actions. The person is in Lagos, Nigeria and speaks Nigerian English (sometimes Pidgin). The text may come from speech recognition and contain mistakes, so infer what they meant.\n' +
+        'Now: ' + fmtDayLong(now) + ' ' + keyOf(now) + ' ' + hhmm(now) + ' (Africa/Lagos).\nOpen tasks: ' + open + '\n' +
+        'Return ONLY JSON: {"intent":"add"|"done"|"delete"|"query"|"other","target":string|null,"tasks":[{"title":string,"date":"YYYY-MM-DD"|null,"time":"HH:MM"|null,"durationMin":number|null,"window":"morning"|"afternoon"|"evening"|"night"|null,"anyTime":boolean,"type":"out"|"desk","importance":1|2|3}],"reply":string|null}\n' +
+        'Rules: one message can hold several tasks. date is null unless a day was given; resolve words like tomorrow, Friday, next week from Now. time only when a clock time was said (24h HH:MM); never invent one. anyTime is true when they said any time or you choose. window only when they said morning/afternoon/evening/night without a clock time. type is "out" when it needs them to go somewhere or meet people, otherwise "desk". importance 3 for urgent, deadlines, bills, health; 1 for optional or low stakes; else 2. title is short, clean and capitalised with no date or time words. For done/delete, target names the matching open task. For query, target is "today" or "tomorrow". For other, put a short friendly reply.\n' +
+        'Message: ' + JSON.stringify(text);
+      let out = await caps.sample.json(prompt, { modelTier: 'quick', cache: false });
+      if (typeof out === 'string') out = JSON.parse(out.slice(out.indexOf('{'), out.lastIndexOf('}') + 1));
+      const n = normalize(out);
+      if (n) { state.aiNote = ''; return n; }
+    } catch (e) { state.aiNote = e && e.code === 'not_granted' ? 'AI understanding is switched off, so I used basic mode.' : ''; }
+  }
+  const l = parseLocal(text, now); l.basic = true; return l;
+}
+
+/* ---------- scheduling flow ---------- */
+const needsAsk = s => s.time == null && !s.any && !s.win;
+function buildTask(s, now) {
+  return { id: newId(), title: s.title, dur: s.dur || 60, type: s.type, imp: s.imp, win: s.win || null, auto: true, done: false, start: 0, createdAt: now, eventId: null, synced: false };
+}
+function describe(t, now) { return '“' + t.title + '” is set for ' + relDay(t.start, now) + (relDay(t.start, now) === fmtDay(t.start) ? '' : ' (' + fmtDay(t.start) + ')') + ' at ' + fmtTime(t.start) + ', ' + fmtDur(t.dur) + '.'; }
+
+async function placeSpec(s, now, msgs) {
+  const t = buildTask(s, now);
+  const today = dayStart(now);
+  if (s.time != null) {
+    let D = s.date;
+    if (D == null) D = (today + s.time >= now + 5) ? today : today + 1440;
+    t.start = D + s.time; t.auto = false;
+    const cf = conflictsFor(t.start, t.start + t.dur, state.tasks, state.ext, null);
+    if (t.start < now) cf.unshift({ kind: 'past', label: 'a time that has already passed' });
+    if (cf.length) return { ask: { kind: 'confirm', task: t, conflicts: cf } };
+    return { task: t };
+  }
+  const r = scheduleAuto(t, s.date, state.tasks, state.ext, now);
+  if (!r) { msgs.push('I could not find free time for “' + t.title + '” in the next two months. Check your routine?'); return {}; }
+  t.start = r.start;
+  return { task: t, res: r };
+}
+async function commit(t, res, now, msgs) {
+  saveTask(t);
+  const note = [];
+  if (res && res.moved) {
+    const mv = state.tasks.find(x => x.id === res.moved.task.id);
+    if (mv) { const from = mv.start; mv.start = res.moved.newStart; saveTask(mv); await syncTask(mv); note.push('To make room I moved “' + mv.title + '” from ' + fmtDay(from) + ' ' + fmtTime(from) + ' to ' + fmtDay(mv.start) + ' ' + fmtTime(mv.start) + ' (lower priority and more than 48 hours away).'); }
+  }
+  if (res && res.spilled) note.push(fmtDay(res.wanted) + ' had no free space, so I used the next free day.');
+  const ok = await syncTask(t);
+  msgs.push(describe(t, now) + (t.auto ? ' I picked the time.' : '') + (ok ? ' It is in your Google Calendar with reminders.' : (state.settings.calendar ? ' Saved here, but not in your calendar yet.' : (OFFLINE ? ' Open the task to add it to your calendar.' : ''))));
+  note.forEach(n => msgs.push(n));
+}
+async function runQueue(queue, now, msgs) {
+  while (queue.length) {
+    const s = queue.shift();
+    if (needsAsk(s)) {
+      state.pending = { kind: 'when', spec: s, queue };
+      const chips = ['You choose', 'Tomorrow morning', 'Tomorrow evening'];
+      say(msgs.concat(['When should I do “' + s.title + '”? Tell me the day and time, or tap “You choose”.']).join('\n'), { chips });
+      return;
+    }
+    const r = await placeSpec(s, now, msgs);
+    if (r.ask) {
+      r.ask.queue = queue; state.pending = r.ask;
+      const names = r.ask.conflicts.map(c => c.label).join(' and ');
+      say(msgs.concat(['“' + r.ask.task.title + '” at ' + fmtDay(r.ask.task.start) + ' ' + fmtTime(r.ask.task.start) + ' clashes with ' + names + '. Keep it anyway, or should I pick the nearest free time?']).join('\n'), { chips: ['Nearest free time', 'Keep it anyway', 'Cancel it'] });
+      return;
+    }
+    if (r.task) await commit(r.task, r.res, now, msgs);
+  }
+  say(msgs.join('\n') || 'Done.');
+}
+async function answerPending(text, p) {
+  const now = nowL(), low = text.toLowerCase();
+  if (p.kind === 'when') {
+    const w = parseWhen(text, now);
+    if (!w.date && w.time == null && !w.win && !w.any) return false;
+    state.pending = null;
+    const s = p.spec; if (w.date != null) s.date = w.date; if (w.time != null) s.time = w.time; if (w.win) s.win = w.win; if (w.any) s.any = true; if (w.dur) s.dur = w.dur;
+    if (needsAsk(s)) s.any = true;
+    await runQueue([s].concat(p.queue), now, []); return true;
+  }
+  if (p.kind === 'confirm') {
+    state.pending = null; const msgs = [];
+    if (/keep|yes|anyway|fine|ok/.test(low) && !/nearest|free/.test(low)) { await commit(p.task, null, now, msgs); }
+    else if (/nearest|free|pick|choose|change|move/.test(low)) {
+      const f = nearestFree(p.task.start, p.task.dur, p.task.type, state.tasks, state.ext, now, null);
+      if (f === null) msgs.push('I could not find a free slot nearby.'); else { p.task.start = f; p.task.auto = true; await commit(p.task, null, now, msgs); }
+    } else msgs.push('Okay, I dropped “' + p.task.title + '”.');
+    await runQueue(p.queue, now, msgs); return true;
+  }
+  return false;
+}
+function agendaText(D, now) {
+  const items = state.tasks.filter(t => !t.done && dayStart(t.start) === D && (D !== dayStart(now) || t.start + t.dur > now)).sort((a, b) => a.start - b.start);
+  const label = D === dayStart(now) ? 'today' : 'tomorrow';
+  if (!items.length) return 'You have nothing planned ' + label + '. You have about ' + fmtDur(freeMinutes(D, state.tasks, state.ext, now)) + ' free for tasks.';
+  return 'For ' + label + ' you have ' + items.length + (items.length === 1 ? ' task: ' : ' tasks: ') + items.map(t => t.title + ' at ' + fmtTime(t.start)).join(', ') + '.';
+}
+async function toggleDone(t, forceDone) {
+  const now = nowL();
+  t.done = forceDone != null ? forceDone : !t.done; t.doneAt = t.done ? now : null; saveTask(t); render();
+  if (t.eventId) await syncTask(t);
+  render();
+}
+async function act(p, text, now) {
+  if (p.intent === 'add') { const msgs = []; if (p.basic && state.aiNote) msgs.push(state.aiNote); await runQueue(p.tasks.slice(), now, msgs); return; }
+  if (p.intent === 'query') { say(agendaText(/tomorrow/i.test(p.target || text) ? dayStart(now) + 1440 : dayStart(now), now)); return; }
+  if (p.intent === 'done' || p.intent === 'delete') {
+    const t = fuzzyFind(state.tasks.filter(x => !x.done), p.target || text);
+    if (!t) { say('I could not find that task. Say part of its name, like “done with bank”.'); return; }
+    if (p.intent === 'done') { await toggleDone(t, true); say('Well done. I marked “' + t.title + '” as done.'); return; }
+    state.undo = Object.assign({}, t); removeTask(t); unsyncTask(t);
+    say('I deleted “' + t.title + '”.', { chips: ['Undo delete'] }); return;
+  }
+  say(p.reply || 'I can add tasks, mark them done, delete them, or read your plan. Try: “Visit the bank tomorrow at 11am”.');
+}
+async function submit(text) {
+  text = (text || '').trim();
+  if (!text || state.busy) return;
+  $('#inp').value = ''; voiceBuf = '';
+  if (state.convo && /^(stop|stop listening|that'?s all|that is all|i'?m done|thank you|thanks|bye|goodbye|end|okay thank you|ok thanks)[\s.!]*$/i.test(text)) { state.convo = false; state.say = { you: text, text: '', chips: [] }; say('Alright. I am here whenever you need me.'); return; }
+  if (/^undo delete$/i.test(text) && state.undo) { const t = state.undo; state.undo = null; t.eventId = null; t.synced = false; saveTask(t); await syncTask(t); say('Restored “' + t.title + '”.'); return; }
+  state.busy = true; state.say = { you: text, text: 'Thinking…', chips: [] }; renderSay();
+  try {
+    const now = nowL();
+    if (state.cal.status === 'idle' && lsGet('tt_calok') && caps.mcp) { try { await loadExt(); } catch (e) { calErr(e); } }
+    if (state.pending && await answerPending(text, state.pending)) { return; }
+    state.pending = null;
+    await act(await understand(text, now), text, now);
+  } catch (e) { say('Sorry, something went wrong. ' + (e && e.message ? e.message : '')); }
+  finally { state.busy = false; render(); }
+}
+function say(text, o) {
+  state.say = { you: state.say && state.say.you, text, chips: (o && o.chips) || [] };
+  renderSay(); render();
+  speak(text).then(latest => { if (latest) setTimeout(afterSpeak, 350); });
+}
+function afterSpeak() {
+  if (isSpeaking()) { setTimeout(afterSpeak, 500); return; }
+  if (state.convo && !state.listening && !state.busy && caps.dict) startListening(true);
+}
+
+/* ---------- mic ---------- */
+function startListening(auto) {
+  try { if (window.speechSynthesis) speechSynthesis.cancel(); if (caps.tts) caps.tts.stop(); } catch (e) {}
+  voiceBuf = ''; $('#inp').value = ''; state.autoStarted = !!auto;
+  caps.dict.start().catch(e => {
+    state.convo = false;
+    if (auto) { state.say = { you: null, text: 'Voice chat paused. Tap the mic to keep talking.', chips: [] }; renderSay(); return; }
+    if (e && e.code === 'not_granted') say('Microphone access was declined. You can still type, or use your keyboard\'s microphone key.');
+  });
+}
+function toggleMic() {
+  if (!caps.dict) {
+    $('#inp').focus();
+    say('Tap the microphone key on your keyboard and speak. For best accent recognition on Android, add “English (Nigeria)” in Gboard languages.');
+    return;
+  }
+  if (state.listening) { state.convo = false; $('#ltxt').textContent = 'Got it, working on it…'; stopListening(); return; }
+  state.convo = true;
+  startListening(false);
+}
+let silenceT = null, noSpeechT = null, maxT = null;
+function clearVoiceTimers() { clearTimeout(silenceT); clearTimeout(noSpeechT); clearTimeout(maxT); }
+function stopListening() { try { caps.dict.stop().catch(() => {}); } catch (e) {} }
+function setListeningUI(on, msg) {
+  const mic = $('#mic'), strip = $('#listen');
+  mic.classList.toggle('on', on);
+  mic.replaceChildren(icon(on ? 'stop' : 'mic'));
+  mic.setAttribute('aria-label', on ? 'Stop listening' : 'Speak a task');
+  strip.hidden = !on;
+  if (on) $('#ltxt').textContent = msg || 'Listening… speak now';
+  $('#inp').placeholder = on ? 'Listening…' : 'Tell me a task…';
+}
+function wireDictation() {
+  const d = caps.dict; if (!d) return;
+  const heard = text => {
+    $('#ltxt').textContent = text ? '“' + text + '”' : 'Listening… speak now';
+    clearTimeout(noSpeechT); clearTimeout(silenceT);
+    /* a pause of about 2 seconds after you stop talking means you are done */
+    silenceT = setTimeout(() => { $('#ltxt').textContent = 'Got it, working on it…'; stopListening(); }, 2000);
+  };
+  if (d.onError) d.onError(() => { state.convo = false; say('Chrome needs the internet to turn speech into text. Please type this one, or use your keyboard\'s microphone key.'); });
+  d.onPartial(({ text }) => { $('#inp').value = (voiceBuf + ' ' + text).trim(); heard($('#inp').value); });
+  d.onFinal(({ text }) => { voiceBuf = (voiceBuf + ' ' + text).trim(); $('#inp').value = voiceBuf; heard(voiceBuf); });
+  d.onState(({ state: s }) => {
+    state.listening = s === 'listening';
+    if (state.listening) {
+      setListeningUI(true);
+      clearVoiceTimers();
+      const armNoSpeech = ms => { noSpeechT = setTimeout(() => {
+        if (isSpeaking()) { armNoSpeech(2000); return; } /* the assistant is still talking: do not count yet */
+        if (!voiceBuf.trim() && !$('#inp').value.trim()) stopListening();
+      }, ms); };
+      armNoSpeech(8000);
+      maxT = setTimeout(stopListening, 60000);
+      return;
+    }
+    clearVoiceTimers(); setListeningUI(false);
+    const v = (voiceBuf || $('#inp').value || '').trim();
+    if (s === 'idle') {
+      if (v) { voiceBuf = ''; setTimeout(() => submit(v), 200); }
+      else if (state.autoStarted && state.convo) { state.convo = false; state.say = { you: null, text: 'Voice chat paused. Tap the mic when you want to talk again.', chips: [] }; renderSay(); }
+      else { state.convo = false; say('I did not hear anything. Tap the mic and try again, or type it.'); }
+    }
+  });
+}
+
+/* ---------- views ---------- */
+function icon(name) { return h('span', { html: SVG[name], style: 'display:contents' }); }
+function overdue(now) { return state.tasks.filter(t => !t.done && t.start + t.dur <= now).sort((a, b) => a.start - b.start); }
+function taskEl(t, now, late) {
+  const hi = t.imp >= 3;
+  const chk = h('div', { class: 'chk', role: 'checkbox', 'aria-checked': t.done ? 'true' : 'false', 'aria-label': 'Mark done', onclick: e => { e.stopPropagation(); toggleDone(t); } }, icon('check'));
+  const meta = h('div', { class: 'm' },
+    h('span', null, fmtDay(t.start) === fmtDay(now) ? fmtTime(t.start) + ' – ' + fmtTime(t.start + t.dur) : fmtDay(t.start) + ' · ' + fmtTime(t.start)),
+    h('span', { class: 'pill' }, t.type === 'out' ? '📍 Out' : '💻 Anywhere'),
+    hi && h('span', { class: 'pill hi' }, 'High'),
+    late && h('span', { class: 'pill late' }, 'Overdue'),
+    t.synced && h('span', { class: 'pill sync' }, 'In calendar'));
+  return h('button', { class: 'item' + (t.done ? ' done' : '') + (late ? ' late' : ''), onclick: () => editTask(t) }, chk, h('div', { class: 'body' }, h('div', { class: 't' }, t.title), meta));
+}
+function fixedEl(label, s, e) { return h('div', { class: 'fixed' }, h('b', null, fmtTime(s) + ' – ' + fmtTime(e)), h('span', null, label)); }
+
+function todayView(now) {
+  const D = dayStart(now), box = h('div');
+  const late = overdue(now);
+  if (late.length) { box.append(h('div', { class: 'day-h' }, h('h3', null, 'Needs attention'), h('span', null, late.length + ' overdue'))); late.forEach(t => box.append(taskEl(t, now, true))); }
+  const items = [];
+  fixedBlocks(D).forEach(b => { if (b.e > now || b.kind !== 'sleep') items.push({ s: b.s, e: b.e, b }); });
+  state.ext.filter(x => x.s < D + 1440 && x.e > D).forEach(x => items.push({ s: x.s, e: x.e, b: { label: x.label } }));
+  state.tasks.filter(t => dayStart(t.start) === D && (t.done || t.start + t.dur > now)).forEach(t => items.push({ s: t.start, e: t.start + t.dur, t }));
+  items.sort((a, b) => a.s - b.s);
+  const free = freeMinutes(D, state.tasks, state.ext, now);
+  box.append(h('div', { class: 'day-h' }, h('h3', null, 'Today'), h('button', { class: 'btn small', onclick: () => say(agendaText(D, now)) }, '🔊 Read my day')));
+  box.append(h('p', { class: 'free' }, free ? 'About ' + fmtDur(free) + ' free for tasks today.' : 'No free time left for tasks today.'));
+  if (!state.tasks.some(t => !t.done)) box.append(h('div', { class: 'empty' }, h('b', null, 'Nothing on your list yet'), 'Tap the mic and say something like “Visit the bank tomorrow at 11am” or “Call my sister, any time”.'));
+  let nowDone = false;
+  items.forEach(it => {
+    if (!nowDone && it.s > now) { nowDone = true; box.append(h('div', { class: 'nowline' }, 'Now · ' + fmtTime(now))); }
+    box.append(it.t ? taskEl(it.t, now, false) : fixedEl(it.b.label, it.s, it.e));
+  });
+  if (!nowDone) box.append(h('div', { class: 'nowline' }, 'Now · ' + fmtTime(now)));
+  return box;
+}
+function upcomingView(now) {
+  const box = h('div'), D0 = dayStart(now);
+  for (let k = 1; k <= 10; k++) {
+    const D = D0 + k * 1440, ts = state.tasks.filter(t => !t.done && dayStart(t.start) === D).sort((a, b) => a.start - b.start);
+    box.append(h('div', { class: 'day-h' }, h('h3', null, k === 1 ? 'Tomorrow · ' + fmtDay(D) : fmtDayLong(D)), h('span', null, ts.length + (ts.length === 1 ? ' task' : ' tasks') + ' · ' + fmtDur(freeMinutes(D, state.tasks, state.ext, now)) + ' free')));
+    ts.forEach(t => box.append(taskEl(t, now, false)));
+  }
+  return box;
+}
+function doneView(now) {
+  const box = h('div'), ds = state.tasks.filter(t => t.done).sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0)).slice(0, 40);
+  if (!ds.length) box.append(h('div', { class: 'empty' }, h('b', null, 'Nothing finished yet'), 'Tick a task when it is done and it will show up here.'));
+  ds.forEach(t => box.append(taskEl(t, now, false)));
+  return box;
+}
+function calBanner() {
+  if (OFFLINE) return null;
+  const c = state.cal, s = state.settings;
+  if (!s.calendar) return null;
+  if (!caps.mcp) return h('div', { class: 'banner warn' }, 'Calendar sync needs this page opened in claude.ai or the Claude app. Your tasks are still saved here.');
+  const retry = h('button', { class: 'btn primary small', onclick: connectCalendar }, 'Connect / retry');
+  if (c.status === 'idle' && !lsGet('tt_calok')) return h('div', { class: 'banner warn' }, 'Connect Google Calendar so every task gets an event and email reminders.', h('div', { class: 'row' }, retry));
+  if (c.status === 'server_not_connected' || c.status === 'selection_required') return h('div', { class: 'banner bad' }, 'Google Calendar is not connected. Add it in claude.ai under Settings → Connectors, then retry.', h('div', { class: 'row' }, retry));
+  if (c.status === 'needs_reauth') return h('div', { class: 'banner bad' }, 'Google Calendar needs you to reconnect it in claude.ai under Settings → Connectors.', h('div', { class: 'row' }, retry));
+  if (['approval_required', 'consent_required', 'not_in_manifest', 'not_granted'].indexOf(c.status) >= 0) return h('div', { class: 'banner warn' }, 'Please allow calendar access so I can add your tasks.', h('div', { class: 'row' }, retry));
+  if (c.status !== 'ok' && c.status !== 'idle') return h('div', { class: 'banner bad' }, 'Calendar sync hit a problem (' + c.status + '). Your tasks are safe here.', h('div', { class: 'row' }, retry));
+  const n = state.tasks.filter(t => !t.synced && !t.done).length;
+  if (n) return h('div', { class: 'banner warn' }, n + (n === 1 ? ' task is' : ' tasks are') + ' not in your calendar yet.', h('div', { class: 'row' }, h('button', { class: 'btn primary small', onclick: connectCalendar }, 'Sync now')));
+  return null;
+}
+function render() {
+  const root = $('#view'); if (!root) return;
+  const now = nowL(), p = parts(now);
+  const hello = p.h < 12 ? 'Good morning' : p.h < 17 ? 'Good afternoon' : 'Good evening';
+  const D = dayStart(now), wkStart = D - ((p.dow + 6) % 7) * 1440;
+  const left = state.tasks.filter(t => !t.done && dayStart(t.start) === D && t.start + t.dur > now).length;
+  const late = overdue(now);
+  const wk = state.tasks.filter(t => t.start >= wkStart && t.start < wkStart + 7 * 1440);
+  const wkDone = wk.filter(t => t.done).length;
+  root.replaceChildren(...[
+    h('div', { class: 'top' }, h('div', null, h('div', { class: 'hello' }, hello), h('h1', { class: 'date' }, fmtDayLong(now))),
+      h('button', { class: 'iconbtn', 'aria-label': 'Settings', onclick: openSettings }, icon('gear'))),
+    h('div', { class: 'stats' },
+      h('div', { class: 'stat' }, h('b', null, left), h('span', null, 'Left today')),
+      h('div', { class: 'stat' + (late.length ? ' bad' : '') }, h('b', null, late.length), h('span', null, 'Overdue')),
+      h('div', { class: 'stat' }, h('b', null, wkDone + '/' + wk.length), h('span', null, 'Done this week'))),
+    calBanner(),
+    late.length ? h('div', { class: 'banner bad' }, late.length + (late.length === 1 ? ' task slipped.' : ' tasks slipped.') + ' Want me to move ' + (late.length === 1 ? 'it' : 'them') + ' to the next free time?', h('div', { class: 'row' }, h('button', { class: 'btn primary small', onclick: moveOverdue }, 'Move to next free time'))) : null,
+    h('div', { class: 'tabs', role: 'tablist' }, ...['today', 'upcoming', 'done'].map(k => h('button', { role: 'tab', 'aria-selected': state.tab === k ? 'true' : 'false', onclick: () => { state.tab = k; render(); } }, { today: 'Today', upcoming: 'Upcoming', done: 'Done' }[k]))),
+    state.ready ? (state.tab === 'today' ? todayView(now) : state.tab === 'upcoming' ? upcomingView(now) : doneView(now)) : h('p', { class: 'free' }, 'Loading your tasks…')].filter(Boolean));
+}
+async function moveOverdue() {
+  const now = nowL();
+  for (const t of overdue(now)) {
+    const r = scheduleAuto(Object.assign({}, t, { auto: true }), null, state.tasks.filter(x => x.id !== t.id), state.ext, now);
+    if (r) { t.start = r.start; t.auto = true; saveTask(t); await syncTask(t); }
+  }
+  say('Done. I moved your overdue tasks to the next free times.'); render();
+}
+function renderSay() {
+  const box = $('#say'); if (!box) return;
+  const s = state.say;
+  if (!s) { box.hidden = true; return; }
+  box.hidden = false;
+  box.replaceChildren(...[
+    s.you ? h('div', { class: 'you' }, 'You: ' + s.you) : null,
+    h('div', { class: 'bot' }, s.text),
+    s.chips && s.chips.length ? h('div', { class: 'chips' }, ...s.chips.map(c => h('button', { class: 'chip', onclick: () => submit(c) }, c))) : null].filter(Boolean));
+}
+
+/* ---------- sheets ---------- */
+function openSheet(build) {
+  const bg = h('div', { class: 'sheet-bg', onclick: e => { if (e.target === bg) bg.remove(); } });
+  const sh = h('div', { class: 'sheet', role: 'dialog' }); build(sh, () => bg.remove()); bg.append(sh); document.body.append(bg);
+}
+function editTask(t) {
+  openSheet((sh, close) => {
+    const title = h('input', { value: t.title, maxlength: 120 });
+    const date = h('input', { type: 'date', value: keyOf(t.start) });
+    const time = h('input', { type: 'time', value: hhmm(t.start) });
+    const dur = h('select', null, ...[15, 30, 45, 60, 90, 120, 180, 240, 360].map(m => h('option', { value: m, selected: m === t.dur ? true : null }, fmtDur(m))));
+    let imp = t.imp, type = t.type;
+    const seg = (opts, get, set) => { const w = h('div', { class: 'seg' }); const draw = () => w.replaceChildren(...opts.map(o => h('button', { type: 'button', 'aria-pressed': get() === o[0] ? 'true' : 'false', onclick: () => { set(o[0]); draw(); } }, o[1]))); draw(); return w; };
+    const note = h('p', { class: 'free' });
+    sh.append(h('h2', null, 'Edit task'),
+      h('div', { class: 'field' }, h('label', null, 'Task'), title),
+      h('div', { class: 'grid2' }, h('div', { class: 'field' }, h('label', null, 'Date'), date), h('div', { class: 'field' }, h('label', null, 'Time'), time)),
+      h('div', { class: 'field' }, h('label', null, 'How long'), dur),
+      h('div', { class: 'field' }, h('label', null, 'Priority'), seg([[1, 'Low'], [2, 'Normal'], [3, 'High']], () => imp, v => imp = v)),
+      h('div', { class: 'field' }, h('label', null, 'Where'), seg([['out', '📍 Need to go out'], ['desk', '💻 Anywhere']], () => type, v => type = v)),
+      note,
+      OFFLINE ? h('a', { class: 'btn', href: gcalLink(t), target: '_blank', rel: 'noopener', style: 'display:block;text-align:center;text-decoration:none' }, '📅 Add to Google Calendar') : null,
+      h('div', { class: 'rowbtn' },
+        h('button', { class: 'btn danger', onclick: async () => { close(); removeTask(t); unsyncTask(t); render(); say('Deleted “' + t.title + '”.', { chips: [] }); state.undo = Object.assign({}, t); } }, 'Delete'),
+        h('button', { class: 'btn primary', onclick: async () => {
+          const D = fromKey(date.value), [hh, mm] = (time.value || '09:00').split(':');
+          if (D == null) { note.textContent = 'Pick a date.'; return; }
+          t.title = title.value.trim() || t.title; t.dur = +dur.value; t.imp = imp; t.type = type; t.start = D + (+hh) * 60 + (+mm); t.auto = false;
+          const cf = conflictsFor(t.start, t.start + t.dur, state.tasks, state.ext, t.id);
+          saveTask(t); close(); render(); await syncTask(t); render();
+          if (cf.length) say('Saved. Heads up: that overlaps with ' + cf.map(c => c.label).join(' and ') + '.');
+        } }, 'Save')));
+  });
+}
+function openSettings() {
+  loadVoices();
+  openSheet((sh, close) => {
+    const sw = (key, label, sub) => {
+      const b = h('button', { class: 'sw', role: 'switch', 'aria-checked': state.settings[key] ? 'true' : 'false', onclick: () => { state.settings[key] = !state.settings[key]; b.setAttribute('aria-checked', state.settings[key] ? 'true' : 'false'); saveSettings(); render(); } });
+      return h('div', { class: 'set' }, h('div', null, h('b', null, label), h('small', null, sub)), b);
+    };
+    const dot = ok => h('span', { class: 'dot ' + (ok ? 'ok' : 'no') });
+    const v = ngVoice();
+    sh.append(h('h2', null, 'Settings'),
+      sw('speak', 'Speak replies aloud', 'The assistant reads its answers to you.'),
+      OFFLINE ? null : sw('email', 'Email reminders', 'Calendar sends reminders to your email before each task.'),
+      OFFLINE ? null : sw('calendar', 'Add tasks to Google Calendar', 'Every task becomes an event.'),
+      OFFLINE ? h('div', { class: 'set' }, h('div', null, h('b', null, 'Calendar'), h('small', null, 'Download all upcoming tasks as a calendar file with reminders.')), h('button', { class: 'btn small', onclick: exportIcs }, 'Export')) : null,
+      h('div', { class: 'tip' },
+        h('div', null, dot(true), OFFLINE ? 'Works offline: yes' : null),
+        OFFLINE ? null : h('div', null, dot(!!caps.sample), 'Understanding what you say: ' + (caps.sample ? 'Claude (full)' : 'basic mode')),
+        h('div', null, dot(!!caps.dict), 'Voice input in this page: ' + (caps.dict ? 'on' : 'use your keyboard\'s mic key')),
+        h('div', null, dot(!!v), 'Nigerian English voice: ' + (v ? v.name : 'not found on this device')),
+        OFFLINE ? null : h('div', null, dot(state.cal.status === 'ok'), 'Google Calendar: ' + (state.cal.status === 'ok' ? 'connected' : 'not connected yet'))),
+      h('div', { class: 'tip' }, 'Accent tip (Android): open Settings → System → Languages → Gboard → add English (Nigeria). For the voice, open Settings → Text-to-speech → Google → Install voice data → English (Nigeria).'),
+      h('div', { class: 'tip' }, 'Your routine is built in: sleep 12:30–6:30 AM daily, lunch 12–1 PM, work Mon–Fri 3–11:30 PM, Ms. Fatima Tue–Sat 9–11 AM, church Sunday 8 AM–2 PM. Tasks never go in those times. Ask Claude to change them.'),
+      h('div', { class: 'rowbtn' }, h('button', { class: 'btn', onclick: () => speak('Hello. I am ready. Tell me your next task.') }, 'Test voice'), h('button', { class: 'btn primary', onclick: close }, 'Close')));
+  });
+}
+
+/* ---------- boot ---------- */
+function mount() {
+  const app = $('#app');
+  app.append(h('div', { id: 'view' }));
+  const inp = h('input', { id: 'inp', type: 'text', placeholder: 'Tell me a task…', autocomplete: 'off', enterkeyhint: 'send', 'aria-label': 'Task' });
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') submit(inp.value); });
+  document.body.append(h('div', { class: 'dock' }, h('div', { class: 'dock-in' },
+    h('div', { id: 'say', class: 'say', hidden: true, 'aria-live': 'polite' }),
+    h('div', { id: 'listen', class: 'listen', hidden: true, 'aria-live': 'polite' }, h('span', { class: 'wave', 'aria-hidden': 'true' }, h('i'), h('i'), h('i'), h('i'), h('i')), h('span', { id: 'ltxt' }, 'Listening… speak now')),
+    h('div', { class: 'bar' }, inp,
+      h('button', { class: 'send', 'aria-label': 'Add task', onclick: () => submit(inp.value) }, icon('send')),
+      h('button', { id: 'mic', class: 'mic', 'aria-label': 'Speak a task', onclick: toggleMic }, icon('mic'))))));
+  render();
+  try { if (window.speechSynthesis) { loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; } } catch (e) {}
+  setInterval(() => { if (!document.hidden && !document.querySelector('.sheet-bg')) render(); }, 30000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) render(); });
+}
+async function boot() {
+  mount();
+  initStore().then(() => render());
+  use('sample').then(s => { caps.sample = s; });
+  use('tts').then(s => { caps.tts = s; if (s && s.onState) s.onState(({ state: st }) => { ttsBusy = st === 'speaking' || st === 'paused'; }); });
+  use('dictation').then(d => { caps.dict = d; wireDictation(); });
+  use('mcp').then(async m => {
+    caps.mcp = m; render();
+    if (m && lsGet('tt_calok') && state.settings.calendar) { try { await loadExt(); await syncAll(); } catch (e) { calErr(e); } render(); }
+  });
+}
+window.__tt = { state, caps, submit, render };
+boot();
+})();
+
+</script>
+<script>
+if ('serviceWorker' in navigator) { window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); }); }
+try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
+</script>
+</body>
+</html>
